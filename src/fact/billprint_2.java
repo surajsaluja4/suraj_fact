@@ -24,16 +24,21 @@ public class billprint_2 {
 
     JLabel GSTNo,Mob1,Mob2,Logo,Firm_Name,Address,Address2,Date,Specialty,Customer_Name,Customer_GST,Customer_Address,Customer_Number,Invoice_Number,Cust_Details,Amt_words;
 Float total_amt=0.0f,dis_percentage=0.0f,friegt_val=0.0f,cgst_val=0.0f,sgst_val=0.0f,igst_val=0.0f,gross=0.0f,round_val=0.0f,amt_pay_val=0.0f;
-    JLabel owner_name_signature,signauture_firm_name;
+    JLabel owner_name_signature,signauture_firm_name,amt_word_value;
     JLabel SrNO,Products_Name,Product_Hsn,Product_Quantity,Product_Rate,Product_Amount,Total_Value,Sgst_Tax,Cgst_Tax,Igst_Tax,Roundoff_value,Grand_Total,Discount,GrossDiscount,Tot_Freight;
     JLabel transport_Details,Transport_Mode,Vehicle_Number,Transport_GrNumber,Transport_place,Bank_Details,Bank_Name1,Bank_Acc1,Bank_Name2,Bank_Acc2,Bank_Name3,Bank_Acc3;
     JLabel Srnos[],Product_Names[],Product_Hsns[],Product_Quantitys[],Product_Rates[],Product_Amounts[];
     JPanel panel_firmdetail,panel_custdetail,panel_products,panel_values,panel_signature,panel_transport,panel_productheading,panel_Bank,panel_amt_word,panel_print;
 JLabel tot_val_label,discount_value_label,frieght_value_label,sgst_label,gross_value_label,cgst_value_label,total_value_label,igst_value_label,round_value_label;
     JFrame frame;
+    String amt_word;
+
     DecimalFormat df2=new DecimalFormat("#.##");
-static int row_table;
-    public billprint_2() {
+static int row_table,billno;
+    public billprint_2(int bno) {
+        billno=bno;
+        setrows();
+        
         frame=new JFrame("Billing");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
@@ -59,7 +64,7 @@ static int row_table;
         Specialty=new JLabel(Seller_Details.speciality);
         Logo=new JLabel(new ImageIcon(Seller_Details.logo_image));
         Date=new JLabel("Date : 10/08/2017");
-        Invoice_Number=new JLabel("Invoice Number : ");
+        Invoice_Number=new JLabel("Invoice Number : "+billno);
 
         GSTNo.setBounds(10, 10, 200, 50);
         Mob1.setBounds(frame.getWidth()-150, 20, 150, 20);
@@ -69,7 +74,7 @@ static int row_table;
         Address.setBounds((frame.getWidth()/2)-90, 130, 180,30);
         Address2.setBounds((frame.getWidth()/2)-100, 150, 200, 30);
         Logo.setBounds(10, 50, 100, 100);
-        Invoice_Number.setBounds(10, 160, 100, 20);
+        Invoice_Number.setBounds(10, 160, 150, 20);
         Date.setBounds(frame.getWidth()-150, 160, 150, 20);
 
 
@@ -174,7 +179,7 @@ panel_products.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.black
 
 panel_Bank=new JPanel(null);
 panel_Bank.setBackground(Color.WHITE);
-panel_Bank.setBounds(0, 500, (frame.getWidth()/2)-100, 150);
+panel_Bank.setBounds(0, 500, (frame.getWidth()/2)-100, 110);
 panel_Bank.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
 
 Bank_Details=new JLabel(Seller_Details.bank_Details);
@@ -198,19 +203,22 @@ panel_Bank.add(Bank_Name1);
 panel_Bank.add(Bank_Acc1);
 panel_Bank.add(Bank_Name2);
 panel_Bank.add(Bank_Acc2);
-panel_Bank.add(Bank_Name3);
-panel_Bank.add(Bank_Acc3);
+//panel_Bank.add(Bank_Name3);
+//panel_Bank.add(Bank_Acc3);
 
 panel_amt_word=new JPanel(null);;
 panel_amt_word.setBackground(Color.WHITE);
-panel_amt_word.setBounds(0, 650, (frame.getWidth()/2)-100, 50);
+panel_amt_word.setBounds(0, 610, (frame.getWidth()/2)-100, 90);
 panel_amt_word.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.BLACK));
 
 Amt_words=new JLabel(Seller_Details.amt_words);
-Amt_words.setBounds(0, 10, panel_amt_word.getWidth(),30);
+Amt_words.setBounds(10, 0, panel_amt_word.getWidth(),10);
+amt_word_value=new JLabel("one Hundred Only",SwingConstants.RIGHT);
+amt_word_value.setVerticalTextPosition(SwingConstants.TOP);
+amt_word_value.setBounds(10, 20, panel_amt_word.getWidth()-20, panel_amt_word.getHeight()-20);
 
 panel_amt_word.add(Amt_words);
-
+panel_amt_word.add(amt_word_value);
 
 panel_values=new JPanel(null);
 panel_values.setBackground(Color.WHITE);
@@ -315,16 +323,41 @@ setdata();
 
         frame.setVisible(true);
     }
-    public static void setrows(int rows){
-        row_table=rows;
+    public static void setrows(){
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+             Connection con=DriverManager.getConnection(Connection1.dbmanager,Connection1.root,Connection1.pass);
+             if(con!=null){
+            String sql="SELECT * FROM `billing` where bill_no="+billno;
+                 System.out.println("===");
+                 System.out.println("sql"+sql);
+            PreparedStatement ps=con.prepareStatement(sql);
+                 System.out.println("ps get row"+ps);
+            ResultSet rs=ps.executeQuery();
+int i=0;
+            while(rs.next()){
+                String[] pq=rs.getString("products").split(",");
+                for(String p:pq){
+
+                    System.out.println("p"+p);
+                }
+
+        row_table=pq.length;
+                System.out.println("rows "+row_table);
+            }
+
+             }
+
+    }catch(Exception get_row_ex){
+            System.out.println("row exception "+get_row_ex);
+    }
+
 
     }
-    public static void main(String[] args) {
-        new billprint_2();
-    }
-
+   
+    
     public void setdata(){
-        setrows(3);
+        
         System.out.println("Inside Set Data "+row_table);
 
          Srnos=new JLabel[row_table];
@@ -344,7 +377,7 @@ setdata();
             Product_Quantitys[i]=new JLabel();
             Product_Rates[i]=new JLabel();
         }
-            get_bill_details(6);
+            get_bill_details();
 //            float amt=Float.parseFloat(Product_Quantitys[i].getText().toString())*Float.parseFloat(Product_Rates[i].getText().toString());
 //            System.out.println("i "+i);
       
@@ -380,21 +413,23 @@ for(int i=0;i<row_table;i++){
         cgst_value_label.setText(Float.toString(tax_vals));
         Float tot=gross_val+tax_vals+tax_vals;
         int round_tot=Math.round(tot);
-        round_value_label.setText(Float.toString(round_tot-tot));
+
+        round_value_label.setText(Float.toString(Float.valueOf(df2.format(round_tot-tot))));
         total_value_label.setText(Float.toString(round_tot));
+        amt_word_value.setText("<html>"+NumberToString.NumberConvert(round_tot).toUpperCase()+" ONLY"+"</html>");
 
         
 
         
 
     }
-    public void get_bill_details(int bill_no){
+    public void get_bill_details(){
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
              Connection con=DriverManager.getConnection(Connection1.dbmanager,Connection1.root,Connection1.pass);
              if(con!=null){
-            String sql="SELECT * FROM `billing` where bill_no="+bill_no;
+            String sql="SELECT * FROM `billing` where bill_no="+billno;
                  System.out.println("sql"+sql);
             PreparedStatement ps=con.prepareStatement(sql);
             ResultSet rs=ps.executeQuery();
@@ -473,11 +508,15 @@ int k=0;
 
 
         } catch (Exception ex) {
-            System.out.println("exception create table"+ex);
+            System.out.println("exception get bill details"+ex);
         }
 
 
     }
+    public static void main(String[] args) {
+        new billprint_2(11);
+    }
+
     
 
 

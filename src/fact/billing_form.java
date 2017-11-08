@@ -578,8 +578,8 @@ if(e.getSource()==clear)
                                   st.setString(8, cn.getText().toString());
                                   st.executeUpdate();
                                    JOptionPane.showMessageDialog(null,"Bill inserted successfully");
-                                   billprint_2.setrows(tb.getRowCount());
-                                   new billprint_2();
+                              //     billprint_2.setrows(tb.getRowCount());
+                                   new billprint_2(Integer.parseInt(b.getText().toString()));
                                    frame.setVisible(false);
 
                         }

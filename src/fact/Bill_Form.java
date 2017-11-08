@@ -595,9 +595,9 @@ public long new_mob(String a)
              else if((gst.isEmpty())||(cust_phno_string.isEmpty())){
                  JOptionPane.showMessageDialog(null, Seller_Details.cust_details_error);
            }
-           else if(Integer.parseInt(discount_string)>max_dis){
-               JOptionPane.showMessageDialog(null, "Discount Cannot Be Greater Than "+max_dis+"%");
-           }
+//           else if(Integer.parseInt(discount_string)>max_dis){
+//               JOptionPane.showMessageDialog(null, "Discount Cannot Be Greater Than "+max_dis+"%");
+//           }
             else {
             try{
 
@@ -628,7 +628,8 @@ public long new_mob(String a)
                                   if(rsbill.next()){
                                       JOptionPane.showMessageDialog(null, "Bill "+invoice_text.getText()+"Saved SuccessFully");
                                       frame.dispose();
-                                      new Bill_Form();
+                                      
+                                      new billprint_2(Integer.parseInt(invoice_text.getText()));
                                   }
                                   else{
                                       JOptionPane.showMessageDialog(null, "Bill "+invoice_text.getText()+"Cannot Be Saved","OOPS",JOptionPane.WARNING_MESSAGE);

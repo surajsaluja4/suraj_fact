@@ -29,8 +29,8 @@ JPanel panelscroll,panelback,panel;
 JTable table;
 JScrollPane sp;
 DefaultTableModel model;
-Object []column=new Object[12];
-Object []data=new Object[12];
+Object []column=new Object[14];
+Object []data=new Object[14];
 static JFrame frameselected;
 static String getselected;
 
@@ -64,7 +64,7 @@ Font f10=new Font("Times New Roman",Font.PLAIN, 20);
             Class.forName("com.mysql.jdbc.Driver");
              Connection con=DriverManager.getConnection(Connection1.dbmanager,Connection1.root,Connection1.pass);
              if(con!=null){
-            String sql="SELECT * FROM `billing`";
+            String sql="SELECT * FROM `billing` where status='true'";
             PreparedStatement ps=con.prepareStatement(sql);
             ResultSet rs=ps.executeQuery();
 int i=0;
@@ -79,15 +79,17 @@ int i=0;
 //                System.out.println("rs 1"+rs.getLong(4));
                 data[4]=rs.getLong("cstno");
 //                System.out.println("rs 5"+rs.getString(5));
-                data[5]=rs.getString("custname");
+                data[5]=rs.getString("gst_tax");
 //                System.out.println("rs 5"+rs.getString(6));
                 String products=rs.getString("products");
                 String allproducts="<html>";
                 String prodsize="<html>";
                 String prodquant="<html>";
                 String proddis="<html>";
+                String sp="<html>";
                 String total2="<html>";
                 float total_val=0;
+                float tot_f=0;
                 String[] s=products.split(",");
                 for(String product:s){
 
@@ -99,31 +101,40 @@ int i=0;
                     while(pr.next()){
                         allproducts+=pr.getString("name")+"<br>";
                         prodsize+=pr.getString("size")+"<br>";
+                        sp+=pr.getString("sp")+"<br>";
+                        tot_f=tot_f+Float.parseFloat(pr.getString("sp"));
+
                     }
+                    System.out.println("Total Value "+tot_f);
                 }
-                data[6]=allproducts+"</html>";
+                data[5]=allproducts+"</html>";
 
 //                System.out.println("rs 5"+rs.getString(7));
-                data[7]=prodsize+"</html>";
+                data[6]=prodsize+"</html>";
 //                System.out.println("rs 5"+rs.getString(8));
                 String[] quant=rs.getString("quantity").split(",");
                 for(String quantity:quant){
                     prodquant+=quantity+"<br>";
                 }
-                data[8]=prodquant+"</html>";
-
-                String[] dis=rs.getString("disc").split(",");
-                for(String discount:dis){
-                    proddis+=discount+"<br>";
-                }
-                data[9]=proddis+"</html>";
+                data[7]=prodquant+"</html>";
+                data[8]=sp+"</html>";
+//                String[] dis=rs.getString("disc").split(",");
+//                for(String discount:dis){
+//                    proddis+=discount+"<br>";
+//                }
+                
                 String[] totals=rs.getString("total").split(",");
                 for(String tot:totals){
                     total2+=tot+"<br>";
                     total_val+=Float.parseFloat(tot);
                 }
-                data[10]=total2+"</html>";
-                data[11]=total_val;
+                Float tot_db=Float.parseFloat(rs.getString("total"));
+                float dis=Float.parseFloat(rs.getString("disc"));
+                data[9]=(dis*tot_db)/100;
+                data[10]=tot_db-Float.parseFloat(data[9].toString());
+                data[11]=rs.getString("frieght");
+                data[12]=(Float.parseFloat(rs.getString("gst_tax"))*Float.parseFloat(data[10].toString())/100);
+                data[13]=Float.parseFloat(data[10].toString())+Float.parseFloat(data[11].toString())+Float.parseFloat(data[12].toString());
                 model.addRow(data);
             }
              }
@@ -141,14 +152,15 @@ int i=0;
     column[1]="Bill Number";
     column[2]="Bill Date";
     column[3]="Bill Time";
-    column[4]="Customer Name";
-    column[5]="Customer Number";
-    column[6]="Items";
-    column[7]="Size";
-    column[8]="Quantity";
+    column[4]="Customer Number";
+    column[5]="Items";
+    column[6]="Size";
+    column[7]="Quantity";
+    column[8]="Unit Price";
     column[9]="Discount";
-    column[10]="Total";
-    column[11]="Total Bill Value";
+    column[10]="Taxable value";
+   column[11]="Frieght";
+  column[12]="Tax";
         model = new DefaultTableModel()
         {
 
